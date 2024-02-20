@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "\\"
+version = "0.1.0"
+description = ""
+authors = ["hotratx <mgviero@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.11.7"
+pyside6 = "^6.6.2"
+pyinstaller = "^6.4.0"
+dask = {extras = ["distributed"], version = "^2024.2.0"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
