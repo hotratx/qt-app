@@ -17,24 +17,33 @@ class Window(QMainWindow):
         font.setPixelSize(90)
         base.setFont(font)
 
-        label = QLabel('Deixa um like!')
-        label.setAlignment(Qt.AlignCenter)
+        self.label = QLabel('Deixa um like!')
+        self.label.setAlignment(Qt.AlignCenter)
 
         botao = QPushButton('Botão!')
+        botao.clicked.connect(self.sinal_de_exemplo)
 
-        layout.addWidget(label)
+        layout.addWidget(self.label)
         layout.addWidget(botao)
 
         base.setLayout(layout)
         self.setCentralWidget(base)
 
         action = QAction('Ação', self)
+        action.triggered.connect(self.sinal_de_exemplo)
         menu = self.menuBar()
         menu_geral = menu.addMenu('Menu')
         menu_geral.addAction(action)
 
+    def sinal_de_exemplo(self):
+        self.label.setText('Cliquei')
+        print('Apertei o botão!!!')
+
+
+from qt_material import apply_stylesheet
 
 app = QApplication()
+apply_stylesheet(app, theme='dark_teal.xml')
 
 window = Window()
 window.show()

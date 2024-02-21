@@ -588,6 +588,21 @@ files = [
 ]
 
 [[package]]
+name = "qt-material"
+version = "2.14"
+description = "Material inspired stylesheet for PySide2, PySide6, PyQt5 and PyQt6."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "qt-material-2.14.tar.gz", hash = "sha256:b5dbb5ade97217cf7ae336bb7c047c90beb39dc7f2048a498c916ad5f2f7ae23"},
+    {file = "qt_material-2.14-py3-none-any.whl", hash = "sha256:ceddd9b3aca167e5d620644ce350c3df4c0220c5df457ab6059f634d7ac747e3"},
+]
+
+[package.dependencies]
+Jinja2 = "*"
+
+[[package]]
 name = "setuptools"
 version = "69.1.0"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
@@ -694,6 +709,18 @@ socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
+name = "xmltodict"
+version = "0.13.0"
+description = "Makes working with XML feel like you are working with JSON"
+category = "main"
+optional = false
+python-versions = ">=3.4"
+files = [
+    {file = "xmltodict-0.13.0-py2.py3-none-any.whl", hash = "sha256:aa89e8fd76320154a40d19a0df04a4695fb9dc5ba977cbb68ab3e4eb225e7852"},
+    {file = "xmltodict-0.13.0.tar.gz", hash = "sha256:341595a488e3e01a85a9d8911d8912fd922ede5fecc4dce437eb4b6c8d037e56"},
+]
+
+[[package]]
 name = "zict"
 version = "3.0.0"
 description = "Mutable mapping tools"
@@ -724,4 +751,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.7"
-content-hash = "a30fa2fcaa9d685c0a11e34916f35ffdfae66db672983456ebc1ac141bb1166d"
+content-hash = "7bb7fd47618de34ea4bcf70802d4ff7e445ec33575c4f1a86089ca05d2ff2011"

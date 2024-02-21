@@ -18,11 +18,13 @@ PySide6==6.6.2
 PySide6_Addons==6.6.2
 PySide6_Essentials==6.6.2
 PyYAML==6.0.1
+qt-material==2.14
 shiboken6==6.6.2
 sortedcontainers==2.4.0
 tblib==3.0.0
 toolz==0.12.1
 tornado==6.4
 urllib3==2.2.1
+xmltodict==0.13.0
 zict==3.0.0
 zipp==3.17.0
