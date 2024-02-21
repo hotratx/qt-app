@@ -12,6 +12,7 @@ pyinstaller = "^6.4.0"
 dask = {extras = ["distributed"], version = "^2024.2.0"}
 qt-material = "^2.14"
 xmltodict = "^0.13.0"
+pymongo = "^4.6.1"
 
 
 [build-system]

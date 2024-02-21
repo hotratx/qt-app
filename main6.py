@@ -1,9 +1,18 @@
 import os
 import xmltodict
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
 from qt_material import apply_stylesheet
 from multiprocessing import Pool, cpu_count, current_process
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QFileDialog, QListWidget, QListWidgetItem, QProgressBar
 from PySide6.QtCore import Qt
+
+URL_MONGO = ""
+client = MongoClient(URL_MONGO, server_api=ServerApi('1'))
+db_connection = client["my_database"]
+collection = db_connection.get_collection("datas_xml")
+collection.create_index([('file_name', 1)], unique=True)
+# resultado = collection.insert_one({"vai": "oi"})
 
 
 def listar_pastas_e_subpastas(caminho, data_list):
@@ -27,9 +36,6 @@ def read_xml(name):
     with open(name, 'r', encoding='utf-8') as arquivo:
         xml_dict = xmltodict.parse(arquivo.read())
     return xml_dict
-
-
-def save_mongo(file): print(f"save file: {file}")
 
 
 class SeletorDePastaApp(QWidget):
@@ -80,9 +86,22 @@ class SeletorDePastaApp(QWidget):
             if isinstance(resp, Error):
                 print(f"achou error: {resp}")
                 self.list_errors.addItem(f"Erro no arquivo: {resp.file}")
-            output.append(resp)
+            else:
+                output.append(resp)
+        self.insert_lotes(output, 10)
         print("terminou")
         print(f"result len: {len(output)}")
+
+    def insert_lotes(self, dados, LEN_LOTE):
+        self.progress_bar.setRange(0, len(dados))
+        self.progress_bar.setValue(0)
+
+        for i in range(0, len(dados), LEN_LOTE):
+            lote = dados[i:i + LEN_LOTE]
+            collection.insert_many(lote)
+            self.progress_bar.setValue(i)
+
+
 
 
 def main():
