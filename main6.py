@@ -1,6 +1,7 @@
 import os
 import xmltodict
-import dask.bag as db
+from qt_material import apply_stylesheet
+from multiprocessing import Pool, cpu_count, current_process
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QFileDialog, QListWidget, QListWidgetItem, QProgressBar
 from PySide6.QtCore import Qt
 
@@ -15,77 +16,78 @@ def listar_pastas_e_subpastas(caminho, data_list):
     return data_list
 
 
+class Error:
+    def __init__(self, file: str):
+        self.file = file
+
+
 def read_xml(name):
+    if name == "/home/hotratx/repos/handler-xml/061116/105/nfce_v_0611161051000430559.xml":
+        return Error(name)
     with open(name, 'r', encoding='utf-8') as arquivo:
         xml_dict = xmltodict.parse(arquivo.read())
     return xml_dict
 
 
-def save_mongo(file):
-    print(f"save file: {file}")
-
-
-def run_dask(list_path):
-    dados = db.from_sequence(list_path).map(read_xml)
-    result = dados.compute()
-    return result
-
-# data_list = list()
-# list_path = listar_pastas_e_subpastas("./061116/", data_list)
-# print(f"tamanho da lista de path: {len(list_path)}")
+def save_mongo(file): print(f"save file: {file}")
 
 
 class SeletorDePastaApp(QWidget):
     def __init__(self):
         super().__init__()
-
-        # Layout principal
-        layout = QVBoxLayout(self)
-
         # Botão para selecionar a pasta
-        self.botao_selecionar_pasta = QPushButton("Selecione a pasta")
-        self.botao_selecionar_pasta.clicked.connect(self.exibir_dialogo_selecao_pasta)
-        layout.addWidget(self.botao_selecionar_pasta)
+        self.button_select_folder = QPushButton("Selecione a pasta")
+        self.button_select_folder.clicked.connect(self.show_dialog_folder)
 
-        # Barra de progresso
-        self.barra_progresso = QProgressBar(self)
-        layout.addWidget(self.barra_progresso)
+        self.list_errors = QListWidget()
 
-        # Lista para mostrar os arquivos
-        self.lista_arquivos = QListWidget()
-        layout.addWidget(self.lista_arquivos)
+        self.progress_bar = QProgressBar(self)
+        self.progress_bar.setAlignment(Qt.AlignCenter)
+        self.progress_bar.setFormat("%p%")  # Adiciona a porcentagem
 
-    def exibir_dialogo_selecao_pasta(self):
-        pasta_selecionada = QFileDialog.getExistingDirectory(self, "Selecione uma pasta")
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.button_select_folder)
+        layout.addWidget(self.list_errors)
+        layout.addWidget(self.progress_bar)
+
+    def show_dialog_folder(self):
+        select_folder = QFileDialog.getExistingDirectory(self, "Selecione uma pasta")
         
-        if pasta_selecionada:
-            # Limpar a lista de arquivos
-            print(f"pasta selecionada: {pasta_selecionada}")
+        if select_folder:
+            print(f"pasta selecionada: {select_folder}")
             list_path = list()
-            listar_pastas_e_subpastas(pasta_selecionada, list_path)
-            self.lista_arquivos.clear()
+            list_path = listar_pastas_e_subpastas(select_folder, list_path)
+            # Limpar a lista de arquivos
+            self.list_errors.clear()
             print(f"Quantidade de arquivos: {len(list_path)}")
-            result = run_dask(list_path, )
-            print(f"resultado do run_dask: {result}")
+            self.list_errors.addItem(f"Foram encontrados {len(list_path)} arquivos .xml")
+            self.run(list_path)
 
-            # Listar os arquivos na pasta
-            arquivos = os.listdir(pasta_selecionada)
+    def run(self, path):
+        self.progress_bar.setRange(0, len(path))
+        self.progress_bar.setValue(0)
 
-            # Configurar a barra de progresso
-            self.barra_progresso.setRange(0, len(arquivos))
-            self.barra_progresso.setValue(0)
+        np = cpu_count()
+        print(f"cpu_count: {np}")
+        output = []
+        pool = Pool(processes=np)
+        results = [pool.apply_async(read_xml, args=(file,)) for file in path]
 
-            # Adicionar os arquivos na lista
-            for i, arquivo in enumerate(arquivos):
-                item = QListWidgetItem(arquivo)
-                self.lista_arquivos.addItem(item)
+        for i, p in enumerate(results):
+            self.progress_bar.setValue(i)
+            QApplication.processEvents()
+            resp = p.get()
+            if isinstance(resp, Error):
+                print(f"achou error: {resp}")
+                self.list_errors.addItem(f"Erro no arquivo: {resp.file}")
+            output.append(resp)
+        print("terminou")
+        print(f"result len: {len(output)}")
 
-                # Atualizar a barra de progresso
-                self.barra_progresso.setValue(i + 1)
-                QApplication.processEvents()  # Garantir que a interface do usuário seja atualizada
 
 def main():
     app = QApplication([])
+    apply_stylesheet(app, theme='light_blue.xml')
 
     janela = SeletorDePastaApp()
     janela.show()
